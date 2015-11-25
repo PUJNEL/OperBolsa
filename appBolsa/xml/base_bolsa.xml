@@ -1,0 +1,23 @@
+<operaciones>
+    <accion>
+        <empresa>AAA</empresa>
+        <operacion>compra</operacion>
+        <precio>10000</precio>
+        <cantidad>2</cantidad>
+        <corredor>Corredor1</corredor>
+    </accion>
+    <accion>
+        <empresa>BBB</empresa>
+        <operacion>compra</operacion>
+        <precio>5000</precio>
+        <cantidad>2</cantidad>
+        <corredor>Corredor1</corredor>
+    </accion>
+    <accion>
+        <empresa>AAA</empresa>
+        <operacion>venta</operacion>
+        <precio>12000</precio>
+        <cantidad>2</cantidad>
+        <corredor>Corredor2</corredor>
+    </accion>
+</operaciones>
