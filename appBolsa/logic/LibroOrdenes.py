@@ -22,7 +22,8 @@ class LibroOrdenes():
         self.validarOrdenesIniciales()
 
     def validarOrdenesIniciales(self):
-        
+        print('........................')
+        print(self.ordenes)
         pass
 
     def tramitarOrdenVenta(self):
@@ -54,8 +55,8 @@ class LibroOrdenes():
 
 
 libro = LibroOrdenes.Instance()
-libro.cargar('C:\\Users\\CASAPC\\Downloads\\ejemplos python\\ejemplos python\\untitled\\operaciones.xml')
+libro.cargar('..\\xml\\base_bolsa.xml')
 
 
-for orden in libro.ordenes:
-    print(orden.empresa + " " + orden.operacion  + " " + orden.precio  + " " + orden.corredor  + " " + orden.cantidad)
+#for orden in libro.ordenes:
+ #   print(orden.empresa + " " + orden.operacion  + " " + orden.precio  + " " + orden.corredor  + " " + orden.cantidad)

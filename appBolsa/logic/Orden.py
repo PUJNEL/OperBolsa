@@ -7,3 +7,5 @@ class Orden():
         self.precio = precio
         self.corredor = corredor
         self.cantidad = cantidad
+
+    def __str__(self):
