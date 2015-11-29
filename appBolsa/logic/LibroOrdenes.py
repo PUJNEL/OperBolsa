@@ -26,9 +26,11 @@ class LibroOrdenes():
             ordenObject = Orden(empresa,operacion,precio,corredor,cantidad)
             self.ordenes.append(ordenObject)
             self.tramitarOrden(ordenObject)
-
+    def nuevaOrden(self,accion,empresa,operacion,precio,corredor,cantidad):
+        orden = Orden(empresa,operacion,precio,corredor,cantidad)
+        pass
     def tramitarOrden(self,orden):
-         #si operaci�n es compra, retorna venta (operador ternario). Condici�n lpogica, 0 o 1
+         #si operación es compra, retorna venta (operador ternario). Condición lpogica, 0 o 1
         operacionContraria = ("compra","venta")[orden.operacion=="compra"]
 
         #Lista por comprensi�n
@@ -91,19 +93,16 @@ class LibroOrdenes():
         self.ultimoValorAccionEmpresa[empresa]= valor
 
 
+    def consultarUltimoPrecioAccionPorEmpresa(self, empresa):
+        try:
+            return self.ultimoValorAccionEmpresa[empresa]
+        except:
+            return -1
+
     def tramitarOrdenVenta(self):
         pass
 
-    def tramitarOrdenCompra(self):
-        pass
-
     def cancelarOrdenes(self):
-        pass
-
-    def consultarPreciosAccionesporEmpresa(self, orden):
-        pass
-
-    def consultarValorUltimaCompraVenta(self):
         pass
 
     def notificacionesCorredores(self):
@@ -112,11 +111,7 @@ class LibroOrdenes():
     def consultarPortafolio(self):
         pass
 
-    def consultarCompraAcciones(self):
-        pass
 
-    def consultarVentaAcciones(self):
-        pass
 
 
 
