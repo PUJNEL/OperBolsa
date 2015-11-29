@@ -1,5 +1,33 @@
 <operaciones>
     <accion>
+        <empresa>Kokoriko</empresa>
+        <operacion>compra</operacion>
+        <precio>15000</precio>
+        <cantidad>5000</cantidad>
+        <corredor>Corredor1</corredor>
+    </accion>
+    <accion>
+        <empresa>Kokoriko</empresa>
+        <operacion>venta</operacion>
+        <precio>15000</precio>
+        <cantidad>15000</cantidad>
+        <corredor>Corredor2</corredor>
+    </accion>
+        <accion>
+        <empresa>Kokoriko</empresa>
+        <operacion>compra</operacion>
+        <precio>20000</precio>
+        <cantidad>23000</cantidad>
+        <corredor>Corredor3</corredor>
+    </accion>
+        <accion>
+        <empresa>Kokoriko</empresa>
+        <operacion>venta</operacion>
+        <precio>15000</precio>
+        <cantidad>5000</cantidad>
+        <corredor>Corredor4</corredor>
+    </accion>
+    <accion>
         <empresa>AAA</empresa>
         <operacion>compra</operacion>
         <precio>10000</precio>
@@ -52,14 +80,21 @@
         <empresa>BBB</empresa>
         <operacion>compra</operacion>
         <precio>8000</precio>
-        <cantidad>20</cantidad>
+        <cantidad>2000</cantidad>
         <corredor>Corredor1</corredor>
     </accion>
     <accion>
         <empresa>BBB</empresa>
-        <operacion>ventta</operacion>
+        <operacion>venta</operacion>
         <precio>6000</precio>
         <cantidad>100</cantidad>
+        <corredor>Corredor2</corredor>
+    </accion>
+    <accion>
+        <empresa>BBB</empresa>
+        <operacion>venta</operacion>
+        <precio>6000</precio>
+        <cantidad>1000</cantidad>
         <corredor>Corredor2</corredor>
     </accion>
 </operaciones>

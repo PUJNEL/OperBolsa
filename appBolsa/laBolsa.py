@@ -23,3 +23,4 @@ if __name__ == "__main__":
     app = Bolsa()
     app.cargarLibroOrdenes()
     print(app.libroOrdenes.ordenes)
+    print(app.libroOrdenes.ultimoValorAccionEmpresa)

@@ -10,6 +10,7 @@ class LibroOrdenes():
     def __init__(self):
         self.ordenes = []
         self.ultimoValorAccionEmpresa = {}
+
     def cargar(self, pathAchivoAcciones):
         tree = ET.parse(pathAchivoAcciones)
         root = tree.getroot()
@@ -27,11 +28,11 @@ class LibroOrdenes():
             self.tramitarOrden(ordenObject)
 
     def tramitarOrden(self,orden):
-         #si operación es compra, retorna venta (operador ternario). Condición lpogica, 0 o 1
+         #si operaciï¿½n es compra, retorna venta (operador ternario). Condiciï¿½n lpogica, 0 o 1
         operacionContraria = ("compra","venta")[orden.operacion=="compra"]
 
-        #Lista por comprensión
-        #recorrido ordenes, sacando las de la operación contraria, misma empresa
+        #Lista por comprensiï¿½n
+        #recorrido ordenes, sacando las de la operaciï¿½n contraria, misma empresa
         ordenesProceso = [ordenp for ordenp in self.ordenes
                               if ordenp.operacion == operacionContraria
                               and ordenp.empresa == orden.empresa
@@ -43,36 +44,52 @@ class LibroOrdenes():
                           ]
         print("Orden: ",orden,"------")
         print("Procesar con: ",ordenesProceso,"------")
+
         for ordenp in ordenesProceso:
 
-            #Calculando el Precio de la transaccion:
-            valorTransaccion = 0
-            if(orden.operacion == "compra"):
-                    valorTransaccion = orden.precio
-            elif(orden.operacion == "venta"):
-                    if orden.precio <= ordenp.precio:
-                        valorTransaccion = ordenp.precio
-                    else:
-                        print("valor de venta superior al precio, saltar orden")
-                        continue
+          #detectar el precio de la transaccion
+            if orden.operacion == "compra":
+                valorTransaccion = orden.precio
+            if orden.operacion == "venta":
+                valorTransaccion = ordenp.precio
 
             #descontando las cantidades en las ordenes afectadas
             if(ordenp.cantidad >= orden.cantidad):
                 ordenp.cantidad -=  orden.cantidad
                 orden.cantidad = 0
-                #todo: se debe comunicar al corredor que ya se cumplio con la orden.
-                print("<Comunicar Orden procesada: ", orden," orden>")
-                self.ordenes.remove(orden)
+                self.eliminarOrden(orden)
+                if ordenp.cantidad == 0:
+                    self.eliminarOrden(ordenp)
+
+                self.registrarUltimoValorAccion(orden.empresa,valorTransaccion)
+                self.comunicarCorredor(orden)
+                self.comunicarCorredor(ordenp)
                 break
             elif(ordenp.cantidad < orden.cantidad):
                 orden.cantidad -= ordenp.cantidad
                 ordenp.cantidad = 0
-                #todo: se debe comunicar al corredor que ya se cumplio con la orden.
-                print("<Comunicar Orden procesada: ", ordenp," ordenpx>")
-                self.ordenes.remove(ordenp)
+                self.eliminarOrden(ordenp)
 
-            #registrar el valor de la acción procesada
-            self.ultimoValorAccionEmpresa[orden.empresa] = valorTransaccion
+            self.registrarUltimoValorAccion(orden.empresa,valorTransaccion)
+            self.comunicarCorredor(orden)
+            self.comunicarCorredor(ordenp)
+
+
+    def comunicarCorredor(self, orden):
+        # todo: se debe comunicar al corredor que ya se cumplio con la orden.
+        print("<Comunicar Orden procesada: ", orden, " orden>")
+
+    def eliminarOrden(self, orden):
+        print("--------------------------------------------")
+        print("Remover: ", orden)
+        print(self.ordenes)
+        self.ordenes.remove(orden)
+        print(self.ordenes)
+        print("--------------------------------------------")
+
+    def registrarUltimoValorAccion(self,empresa,valor):
+        self.ultimoValorAccionEmpresa[empresa]= valor
+
 
     def tramitarOrdenVenta(self):
         pass
