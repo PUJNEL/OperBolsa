@@ -4,10 +4,9 @@ class Orden():
         self.idOrden = uuid.uuid4()
         self.empresa = empresa
         self.operacion = operacion
-        self.precio = precio
+        self.precio = int(precio)
         self.corredor = corredor
-        self.cantidad = cantidad
-
+        self.cantidad = int(cantidad)
 
     def getCantidad(self):
         return self.cantidad

@@ -26,11 +26,15 @@ class LibroOrdenes():
             ordenObject = Orden(empresa,operacion,precio,corredor,cantidad)
             self.ordenes.append(ordenObject)
             self.tramitarOrden(ordenObject)
-    def nuevaOrden(self,accion,empresa,operacion,precio,corredor,cantidad):
+    def nuevaOrden(self,empresa,operacion,precio,corredor,cantidad,corredores):
+        print("Creando orden de "+operacion+" para "+empresa+" >> Corredor: ["+corredor+"]")
         orden = Orden(empresa,operacion,precio,corredor,cantidad)
-        pass
-    def tramitarOrden(self,orden):
-         #si operación es compra, retorna venta (operador ternario). Condición lpogica, 0 o 1
+        self.ordenes.append(orden)
+        print("Se creo la orden: "+str(orden.idOrden))
+        return orden
+
+    def tramitarOrden(self,orden,corredores=None):
+         #si operación es compra, retorna venta (operador ternario). Condición logica, 0 o 1
         operacionContraria = ("compra","venta")[orden.operacion=="compra"]
 
         #Lista por comprensi�n
@@ -64,8 +68,11 @@ class LibroOrdenes():
                     self.eliminarOrden(ordenp)
 
                 self.registrarUltimoValorAccion(orden.empresa,valorTransaccion)
-                self.comunicarCorredor(orden)
-                self.comunicarCorredor(ordenp)
+
+                if corredores is not None and orden.corredor in list(corredores.keys()):
+                    self.comunicarCorredor(orden,corredores[orden.corredor])
+                if corredores is not None and ordenp.corredor in list(corredores.keys()):
+                    self.comunicarCorredor(ordenp,corredores[ordenp.corredor])
                 break
             elif(ordenp.cantidad < orden.cantidad):
                 orden.cantidad -= ordenp.cantidad
@@ -73,13 +80,22 @@ class LibroOrdenes():
                 self.eliminarOrden(ordenp)
 
             self.registrarUltimoValorAccion(orden.empresa,valorTransaccion)
-            self.comunicarCorredor(orden)
-            self.comunicarCorredor(ordenp)
 
 
-    def comunicarCorredor(self, orden):
+            if corredores is not None and orden.corredor in list(corredores.keys()):
+                    self.comunicarCorredor(orden,corredores[orden.corredor])
+            if corredores is not None and ordenp.corredor in list(corredores.keys()):
+                    self.comunicarCorredor(ordenp,corredores[ordenp.corredor])
+
+
+    def comunicarCorredor(self, orden, wayTwoCorredor=None):
         # todo: se debe comunicar al corredor que ya se cumplio con la orden.
-        print("<Comunicar Orden procesada: ", orden, " orden>")
+        # todo: way 2
+        if wayTwoCorredor is not None:
+            wayTwoCorredor["wayTwo"].sendMessage("Orden Procesada "+str(orden.idOrden)+" ")
+            print("<Comunicar Orden procesada: ", orden, " orden>")
+        else:
+            print("<Comunicar Orden procesada: ", orden, " orden sin coneccion con corredor>")
 
     def eliminarOrden(self, orden):
         print("--------------------------------------------")
@@ -99,10 +115,23 @@ class LibroOrdenes():
         except:
             return -1
 
-    def tramitarOrdenVenta(self):
-        pass
+    def cancelarOrdenes(self,id_orden):
+        print("Eliminando Orden: ",id_orden)
+        for orden in self.ordenes:
+            if(str(orden.idOrden) == id_orden):
+                try:
+                    self.ordenes.remove(orden)
+                except:
+                    print("Orden no se puede eliminar: ",id_orden)
+                    return False
+                del(orden)
+                print("Orden Eliminada: ",id_orden)
+                return True
+        print("Orden no encontrada: ",id_orden)
+        return False
 
-    def cancelarOrdenes(self):
+
+    def tramitarOrdenVenta(self):
         pass
 
     def notificacionesCorredores(self):
