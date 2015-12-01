@@ -23,7 +23,6 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         #TODO: Logica para poder realizar acciones sobre el InversorObject
         #TODO: COMPRA Realizad Exitosamente
         #TODO: VENTA Realizada Exitosamente
-        #TODO: Retornar Dinero
 
         threadLock_libroDeOrdenes.release()
 
