@@ -160,9 +160,10 @@ class process():
         stateCancel = self.librodeOrdenes.cancelarOrdenes(id_orden)
         msg = ""
         if(stateCancel):
-            msg="Se elimino correctamente la orden de compra: "
+            msg="nocompra_exitoso "
         else:
-            msg="Orden no encontrada: "
+            msg="nocompra_noexistencia "
+        print(msg+" "+str(id_orden))
         self.conn.sendall((msg+" "+str(id_orden)).encode())
 
     def noventa(self):
@@ -170,15 +171,21 @@ class process():
         stateCancel = self.librodeOrdenes.cancelarOrdenes(id_orden)
         msg = ""
         if(stateCancel):
-            msg="Se elimino correctamente la orden de venta: "
+            msg="noventa_exitoso "
         else:
-            msg="Orden no encontrada: "
+            msg="noventa_noexistencia "
+        print(msg+" "+str(id_orden))
         self.conn.sendall((msg+" "+str(id_orden)).encode())
 
     def consulta(self):
         empresa = self.args[0]
         valor = self.librodeOrdenes.consultarUltimoPrecioAccionPorEmpresa(empresa)
-        self.conn.sendall(("El valor de la ultima accion de la empresa "+empresa+" fue $"+str(valor)).encode())
+        if  valor == -1:
+            print("valor_ultima_accion "+empresa+" no_data")
+            self.conn.sendall("valor_ultima_accion "+empresa+" no_data")
+        else:
+            print("valor_ultima_accion "+empresa+" "+str(valor))
+            self.conn.sendall(("valor_ultima_accion "+empresa+" "+str(valor)).encode())
 
     def sumar(self):
         a = self.args[0]

@@ -92,7 +92,7 @@ class LibroOrdenes():
         # todo: se debe comunicar al corredor que ya se cumplio con la orden.
         # todo: way 2
         if wayTwoCorredor is not None:
-            wayTwoCorredor["wayTwo"].sendMessage("Orden Procesada "+str(orden.idOrden)+" ")
+            wayTwoCorredor["wayTwo"].sendMessage("orden_procesada "+str(orden.idOrden)+" ")
             print("<Comunicar Orden procesada: ", orden, " orden>")
         else:
             print("<Comunicar Orden procesada: ", orden, " orden sin coneccion con corredor>")
