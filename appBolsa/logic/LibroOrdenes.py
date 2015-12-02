@@ -1,7 +1,8 @@
+import socket
 from  appBolsa.logic.Orden import Orden
 from appBolsa.utils import singleton
 from xml.etree import  ElementTree as ET
-
+import time
 
 
 @singleton.Singleton
@@ -52,6 +53,7 @@ class LibroOrdenes():
         print("Procesar con: ",ordenesProceso,"------")
 
         for ordenp in ordenesProceso:
+            cantidad = 0
 
           #detectar el precio de la transaccion
             if orden.operacion == "compra":
@@ -62,7 +64,9 @@ class LibroOrdenes():
             #descontando las cantidades en las ordenes afectadas
             if(ordenp.cantidad >= orden.cantidad):
                 ordenp.cantidad -=  orden.cantidad
+                cantidad = orden.cantidad
                 orden.cantidad = 0
+
                 self.eliminarOrden(orden)
                 if ordenp.cantidad == 0:
                     self.eliminarOrden(ordenp)
@@ -70,12 +74,15 @@ class LibroOrdenes():
                 self.registrarUltimoValorAccion(orden.empresa,valorTransaccion)
 
                 if corredores is not None and orden.corredor in list(corredores.keys()):
-                    self.comunicarCorredor(orden,corredores[orden.corredor])
+                    self.comunicarCorredor(orden,cantidad,valorTransaccion,corredores[orden.corredor])
+                    time.sleep(2)
                 if corredores is not None and ordenp.corredor in list(corredores.keys()):
-                    self.comunicarCorredor(ordenp,corredores[ordenp.corredor])
+                    self.comunicarCorredor(ordenp,cantidad,valorTransaccion,corredores[ordenp.corredor])
+                    time.sleep(2)
                 break
             elif(ordenp.cantidad < orden.cantidad):
                 orden.cantidad -= ordenp.cantidad
+                cantidad = ordenp.cantidad
                 ordenp.cantidad = 0
                 self.eliminarOrden(ordenp)
 
@@ -83,16 +90,24 @@ class LibroOrdenes():
 
 
             if corredores is not None and orden.corredor in list(corredores.keys()):
-                    self.comunicarCorredor(orden,corredores[orden.corredor])
+                    self.comunicarCorredor(orden,cantidad,valorTransaccion,corredores[orden.corredor])
+                    time.sleep(2)
             if corredores is not None and ordenp.corredor in list(corredores.keys()):
-                    self.comunicarCorredor(ordenp,corredores[ordenp.corredor])
+                    self.comunicarCorredor(ordenp,cantidad,valorTransaccion,corredores[ordenp.corredor])
+                    time.sleep(2)
 
-
-    def comunicarCorredor(self, orden, wayTwoCorredor=None):
-        # todo: se debe comunicar al corredor que ya se cumplio con la orden.
-        # todo: way 2
+    def comunicarCorredor(self, orden,cantidad,valor, wayTwoCorredor=None):
+        # se debe comunicar al corredor que ya se cumplio con la orden.
+        # way 2
+        # orden_procesada id_orden cantidad valor
         if wayTwoCorredor is not None:
-            wayTwoCorredor["wayTwo"].sendMessage("orden_procesada "+str(orden.idOrden)+" ")
+            #wayTwoCorredor["wayTwo"].sendMessage("orden_procesada "+str(orden.idOrden)+" "+str(cantidad)+" "+str(valor))
+
+            ip = wayTwoCorredor["wayTwo"].addr[0]
+            puerto = wayTwoCorredor["wayTwo"].portWay2
+
+            clientCorredor(ip,puerto,str("orden_procesada "+str(orden.idOrden)+" "+str(cantidad)+" "+str(valor)))
+
             print("<Comunicar Orden procesada: ", orden, " orden>")
         else:
             print("<Comunicar Orden procesada: ", orden, " orden sin coneccion con corredor>")
@@ -140,6 +155,22 @@ class LibroOrdenes():
     def consultarPortafolio(self):
         pass
 
+def clientCorredor(ip, port, message):
+    # print(ip + " " + str(port) + " " + message)
+    response = -1
+    try:
+        print("Enviando Asincrono: ["+str(ip)+":"+str(port)+" <"+str(message)+">]")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((ip, port))
+        sock.sendall(bytes(message, 'ascii'))
+        response = str(sock.recv(1024), 'ascii')
+        print(str(response))
+    except ConnectionRefusedError:
+        print("No se puede conectar con el cliente, Por favor inicielo o verifique los parametros de conexion...")
+        return -1
+    finally:
+        sock.close()
+        return response
 
 
 

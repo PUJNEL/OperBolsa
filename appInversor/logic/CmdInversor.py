@@ -1,12 +1,13 @@
 import cmd
+import uuid
 from appInversor.entity.ClienteServidor import *
 
-#Clase CmdInversor (cmd.Cmd) esto inicia una consola CMD para enviar comandos
+# Clase CmdInversor (cmd.Cmd) esto inicia una consola CMD para enviar comandos
 class CmdInversor(cmd.Cmd):
     intro = 'Bienvenido a la aplicacion Inversor.   Type help or ? to list commands.\n'
     prompt = '(Inversor) '
 
-    #Definicion de Comando COMPRA
+    # Definicion de Comando COMPRA
     def do_compra(self, args):
         "Coloca una orden de compra Ej: COMPRA <EMPRESA> <CANTIDAD> <VALOR>"
         parametros = args.split()
@@ -20,18 +21,18 @@ class CmdInversor(cmd.Cmd):
         except ValueError:
             print("cantidad y/o valor deben ser numericos")
             return
-        datos = []
-        datos.append(self.inversor.nombre)
-        datos.append("COMPRA")
-        datos.append(self.ip)
-        datos.append(self.port)
-        datos.append(empresa)
-        datos.append(cantidad)
-        datos.append(valor)
-        #Hace la peticion al corredor
-        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),str(datos))
-        #print(clienteRespuesta)
-        self.inversor.compraAcciones(empresa, cantidad, valor)
+        comando = "compra " + empresa + " " + str(cantidad) + " " + str(valor) + " " + str(self.port)
+
+        if(self.inversor.compraAcciones(empresa, cantidad, valor)== -1):
+            return
+        # Hace la peticion al corredor
+        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),comando)
+        print("Respuesta Cliente: " + str(clienteRespuesta))
+        if clienteRespuesta == -1:
+            return
+        # Crea la orden y resta el disponible hasta que se procese la orden
+        id = uuid.UUID(clienteRespuesta)
+        self.inversor.crearOrden(id, "COMPRA", empresa, cantidad, valor)
 
     #Definicion de Comando VENTA
     def do_venta(self, args):
@@ -47,20 +48,23 @@ class CmdInversor(cmd.Cmd):
         except ValueError:
             print("cantidad y/o valor deben ser numericos")
             return
-        datos = []
-        datos.append(self.inversor.nombre)
-        datos.append("VENTA")
-        datos.append(self.ip)
-        datos.append(self.port)
-        datos.append(empresa)
-        datos.append(cantidad)
-        datos.append(valor)
-        #Hace la peticion al corredor
-        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),str(datos))
-        #print(clienteRespuesta)
+        comando = "venta " + empresa + " " + str(cantidad) + " " + str(valor) + " " + str(self.port)
+        indexAccion = self.inversor.buscarAccionEmpresa(empresa)
+        if indexAccion == -1:
+            print("No tiene acciones de esta empresa")
+            self.do_portafolio()
+            return
+        # Hace la peticion al corredor
+        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),comando)
+        print("Respuesta Cliente: " + str(clienteRespuesta))
+        if clienteRespuesta == -1:
+            return
+        # Crea la orden y resta las acciones porque ya entraron en la bolsa
+        id = uuid.UUID(clienteRespuesta)
+        self.inversor.crearOrden(id, "VENTA", empresa, cantidad, valor)
         self.inversor.ventaAcciones(empresa, cantidad, valor)
 
-    #Definicion de Comando NOCOMPRA
+    # Definicion de Comando NOCOMPRA
     def do_nocompra(self, args):
         "Cancela una orden de Compra Ej: NOCOMPRA <EMPRESA> <CANTIDAD> <VALOR>"
         parametros = args.split()
@@ -68,26 +72,33 @@ class CmdInversor(cmd.Cmd):
             print("Numero Invalido de Argumentos")
             return
         try:
-            empresa = parametros[0]
+            empresa = parametros[0].upper()
             cantidad = int(parametros[1])
             valor = int(parametros[2])
         except ValueError:
             print("cantidad y/o valor deben ser numericos")
             return
-        print("Empresa  : " + str(empresa))
-        print("Cantidad : " + str(cantidad))
-        print("Valor  : " + str(valor))
-        datos = []
-        datos.append(self.inversor.nombre)
-        datos.append("NOCOMPRA")
-        datos.append(self.ip)
-        datos.append(self.port)
-        datos.append(empresa)
-        datos.append(cantidad)
-        datos.append(valor)
-        #Hace la peticion al corredor
-        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),str(datos))
-        #print(clienteRespuesta)
+        id = self.inversor.buscarOrden("COMPRA",empresa,cantidad,valor)
+        print(str(id))
+        if str(id) == "No encontrado":
+            print("La orden no existe por favor ingrese una orden Valida:")
+            self.do_ordenes()
+            return
+        comando = "nocompra " + str(id)
+        # Hace la peticion al corredor
+        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),comando)
+        print("Respuesta Cliente: " + str(clienteRespuesta))
+        if clienteRespuesta == -1:
+            return
+        mensaje = clienteRespuesta.split(" ")
+        operacion = mensaje[0]
+        idRespuesta = mensaje[1]
+        print(mensaje)
+        print(str(idRespuesta) + "---" + str(id) )
+        if (mensaje[0] == "nocompra_exitoso" and idRespuesta == str(id) ):
+            self.inversor.eliminarOrden(id)
+            #TODO: Eliminar la orden local
+            print("Venta eliminada exitosamente")
 
     #Definicion de Comando NOVENTA
     def do_noventa(self, args):
@@ -103,20 +114,26 @@ class CmdInversor(cmd.Cmd):
         except ValueError:
             print("cantidad y/o valor deben ser numericos")
             return
-        datos = []
-        datos.append(self.inversor.nombre)
-        datos.append("NOVENTA")
-        datos.append(self.ip)
-        datos.append(self.port)
-        datos.append(empresa)
-        datos.append(cantidad)
-        datos.append(valor)
-        print("Empresa  : " + str(empresa))
-        print("Cantidad : " + str(cantidad))
-        print("Valor  : " + str(valor))
-        #Hace la peticion al corredor
-        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),str(datos))
-        #print(clienteRespuesta)
+        id = self.inversor.buscarOrden("VENTA",empresa,cantidad,valor)
+        print(str(id))
+        if str(id) == "No encontrado":
+            print("La orden no existe por favor ingrese una orden Valida:")
+            self.do_ordenes()
+            return
+        comando = "noventa " + str(id)
+        # Hace la peticion al corredor
+        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),comando)
+        print("Respuesta Cliente: " + str(clienteRespuesta))
+        if clienteRespuesta == -1:
+            return
+        mensaje = clienteRespuesta.split(" ")
+        operacion = mensaje[0]
+        idRespuesta = mensaje[1]
+        print(mensaje)
+        print(str(idRespuesta) + "---" + str(id) )
+        if (mensaje[0] == "noventa_exitoso" and idRespuesta == str(id) ):
+            self.inversor.eliminarOrden(id)
+            print("Venta eliminada exitosamente")
 
     #Definicion de Comando CONSULTA
     def do_consulta(self, args):
@@ -130,28 +147,28 @@ class CmdInversor(cmd.Cmd):
           if str(i.empresa).upper() == empresa:
             print("Empresa  : " + str(empresa))
             print("Acciones : " + str(i.cantidad))
-        datos = []
-        datos.append(self.inversor.nombre)
-        datos.append("CONSULTA")
-        datos.append(self.ip)
-        datos.append(self.port)
-        datos.append(empresa)
+        comando = "consulta " + empresa
         #Hace la peticion al corredor
-        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),str(datos))
-        #TODO: Muestra al usuario el valor de la acción
-
+        clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),comando)
+        print("Valor de la Accion: " + str(clienteRespuesta))
         #print(clienteRespuesta)
 
     #Definicion de Comando PORTAFOLIO
-    def do_portafolio(self, args):
+    def do_portafolio(self, args=0):
         "Muestra la cantidad de dinero en Efectivo que posee un inversor y l alista de acciones y sus cantidades"
         print("--------------Efectivo--------------")
-        print("Efectivo : " + str(self.inversor.efectivo))
+        print("Efectivo  : " + str(self.inversor.efectivo))
+        print("Disponible: " + str(self.inversor.disponible))
         print("--------------Acciones--------------")
         for accion in self.inversor.acciones:
-            print("Empresa  : " + accion.empresa + " Cantidad : " + str(accion.cantidad))
+            print("Empresa   : " + accion.empresa + " Cantidad : " + str(accion.cantidad))
         print("------------------------------------")
 
+    def do_ordenes(self, args=0):
+        count = 1
+        for orden in self.inversor.ordenes:
+            print("Orden No. " + str(count) + " " + str(orden))
+            count += 1
     #Definicion de Comando QUIT
     def do_quit(self, line):
         "Termina la conexion con el corredor."

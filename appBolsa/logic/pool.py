@@ -100,6 +100,7 @@ class WayTwo(threading.Thread):
             #self.lock.acquire() #INICIA EL BLOQUEO DE conteo COMO RECURSO COMPARTIDO
             print("Enviando a ",self.addr,">> ")
             try:
+                time.sleep(1)
                 self.connWay2.sendall(str(msg).encode())
                 #self.lock.release() #INDICA QUE YA SE TERMINO DE UTILIZAR EL USO DE conteo Y SE LIBERA EL RECUSO
                 return True
