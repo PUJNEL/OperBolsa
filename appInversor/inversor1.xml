@@ -1,0 +1,13 @@
+<inversor>
+    <efectivo>20000000</efectivo>
+    <acciones>
+        <accion>
+            <empresa>eee</empresa>
+            <cantidad>20</cantidad>
+        </accion>
+        <accion>
+            <empresa>jjj</empresa>
+            <cantidad>10</cantidad>
+        </accion>
+    </acciones>
+</inversor>
