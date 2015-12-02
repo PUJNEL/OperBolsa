@@ -162,16 +162,20 @@ class InversorObject():
                 valor = self.ordenes[index].valor
                 print(str(self.ordenes[index]))
                 if(operacion == "COMPRA"):
-                    print("ENTRA COMPRA DEVOLVER DISPONIBLE")
+                    print("ENTRA COMPRA ASINCRONO")
                     self.efectivo = self.efectivo - (valorProc * cantidadProc)
-                    self.disponible = self.efectivo + (valor * cantidad)
-                    self.disponible = self.disponible - (valorProc * cantidadProc)
+                    #self.disponible = self.disponible + (valor*cantidad - valorProc*cantidadProc)
+                    #self.disponible = self.disponible + (valorProc * cantidadProc)
+                    #self.disponible = self.disponible - (valor * cantidad)
                     self.ordenes[index].cantidad = self.ordenes[index].cantidad - cantidadProc
                     accion = Accion(str(empresa), cantidadProc)
                     self.sumarAccion(accion)
                 if(operacion == "VENTA"):
+                    print("ENTRA VENTA ASINCRONO")
                     self.efectivo = self.efectivo + (valorProc * cantidadProc)
+                    self.disponible = self.disponible + (valorProc * cantidadProc)
                     self.ordenes[index].cantidad = self.ordenes[index].cantidad - cantidadProc
-                self.ordenes.pop(index)
+                if self.ordenes[index].cantidad == 0:
+                    self.ordenes.pop(index)
                 return 1
             return -1

@@ -1,0 +1,1 @@
+python inversor.py -n nombre1 -p 50008 -h 127.0.0.1 -a "C:\xml\xml.xml" -l 57001

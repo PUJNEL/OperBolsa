@@ -150,7 +150,11 @@ class CmdInversor(cmd.Cmd):
         comando = "consulta " + empresa
         #Hace la peticion al corredor
         clienteRespuesta = client(self.inversor.hostCorredor, int(self.inversor.puertoCorredor),comando)
-        print("Valor de la Accion: " + str(clienteRespuesta))
+        mensaje = clienteRespuesta.split(" ")
+        respuesta = mensaje[0]
+        empresa = mensaje[1]
+        valor = mensaje[2]
+        print("Valor de la Accion: " + empresa + " " + valor )
         #print(clienteRespuesta)
 
     #Definicion de Comando PORTAFOLIO

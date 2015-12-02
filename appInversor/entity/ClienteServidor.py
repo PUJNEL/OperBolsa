@@ -35,7 +35,7 @@ def client(ip, port, message):
         sock.connect((ip, port))
         sock.sendall(bytes(message, 'ascii'))
         response = str(sock.recv(1024), 'ascii')
-        print(str(response))
+        #print(str(response))
     except ConnectionRefusedError:
         print("No se puede conectar con el cliente, Por favor inicielo o verifique los parametros de conexion...")
         return -1

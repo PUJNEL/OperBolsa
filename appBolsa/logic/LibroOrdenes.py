@@ -51,6 +51,7 @@ class LibroOrdenes():
                           ]
         print("Orden: ",orden,"------")
         print("Procesar con: ",ordenesProceso,"------")
+        print("Libro: ",self.ordenes,"------")
 
         for ordenp in ordenesProceso:
             cantidad = 0
